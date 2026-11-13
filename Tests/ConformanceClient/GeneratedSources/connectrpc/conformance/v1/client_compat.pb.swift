@@ -233,6 +233,16 @@ nonisolated struct Connectrpc_Conformance_V1_ClientCompatRequest: @unchecked Sen
   /// Clears the value of `rawRequest`. Subsequent reads from it will return its default value.
   mutating func clearRawRequest() {_uniqueStorage()._rawRequest = nil}
 
+  /// If protocol indicates Connect and stream type indicates
+  /// Unary, this instructs the client to use the HTTP QUERY method
+  /// (RFC 10008) when making the request. The request is otherwise
+  /// identical to a unary POST request. It is never set together with
+  /// use_get_http_method.
+  var useQueryHTTPMethod: Bool {
+    get {_storage._useQueryHTTPMethod}
+    set {_uniqueStorage()._useQueryHTTPMethod = newValue}
+  }
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   nonisolated struct Cancel: Sendable {
@@ -542,7 +552,7 @@ fileprivate nonisolated let _protobuf_package = "connectrpc.conformance.v1"
 
 nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".ClientCompatRequest"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}test_name\0\u{3}http_version\0\u{1}protocol\0\u{1}codec\0\u{1}compression\0\u{1}host\0\u{1}port\0\u{3}server_tls_cert\0\u{3}client_tls_creds\0\u{3}message_receive_limit\0\u{1}service\0\u{1}method\0\u{3}stream_type\0\u{3}use_get_http_method\0\u{3}request_headers\0\u{3}request_messages\0\u{3}timeout_ms\0\u{3}request_delay_ms\0\u{1}cancel\0\u{3}raw_request\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}test_name\0\u{3}http_version\0\u{1}protocol\0\u{1}codec\0\u{1}compression\0\u{1}host\0\u{1}port\0\u{3}server_tls_cert\0\u{3}client_tls_creds\0\u{3}message_receive_limit\0\u{1}service\0\u{1}method\0\u{3}stream_type\0\u{3}use_get_http_method\0\u{3}request_headers\0\u{3}request_messages\0\u{3}timeout_ms\0\u{3}request_delay_ms\0\u{1}cancel\0\u{3}raw_request\0\u{3}use_query_http_method\0")
 
   fileprivate class _StorageClass {
     var _testName: String = String()
@@ -565,6 +575,7 @@ nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtob
     var _requestDelayMs: UInt32 = 0
     var _cancel: Connectrpc_Conformance_V1_ClientCompatRequest.Cancel? = nil
     var _rawRequest: Connectrpc_Conformance_V1_RawHTTPRequest? = nil
+    var _useQueryHTTPMethod: Bool = false
 
       // This property is used as the initial default value for new instances of the type.
       // The type itself is protecting the reference to its storage via CoW semantics.
@@ -595,6 +606,7 @@ nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtob
       _requestDelayMs = source._requestDelayMs
       _cancel = source._cancel
       _rawRequest = source._rawRequest
+      _useQueryHTTPMethod = source._useQueryHTTPMethod
     }
   }
 
@@ -633,6 +645,7 @@ nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtob
         case 18: try { try decoder.decodeSingularUInt32Field(value: &_storage._requestDelayMs) }()
         case 19: try { try decoder.decodeSingularMessageField(value: &_storage._cancel) }()
         case 20: try { try decoder.decodeSingularMessageField(value: &_storage._rawRequest) }()
+        case 21: try { try decoder.decodeSingularBoolField(value: &_storage._useQueryHTTPMethod) }()
         default: break
         }
       }
@@ -705,6 +718,9 @@ nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtob
       try { if let v = _storage._rawRequest {
         try visitor.visitSingularMessageField(value: v, fieldNumber: 20)
       } }()
+      if _storage._useQueryHTTPMethod != false {
+        try visitor.visitSingularBoolField(value: _storage._useQueryHTTPMethod, fieldNumber: 21)
+      }
     }
     try unknownFields.traverse(visitor: &visitor)
   }
@@ -734,6 +750,7 @@ nonisolated extension Connectrpc_Conformance_V1_ClientCompatRequest: SwiftProtob
         if _storage._requestDelayMs != rhs_storage._requestDelayMs {return false}
         if _storage._cancel != rhs_storage._cancel {return false}
         if _storage._rawRequest != rhs_storage._rawRequest {return false}
+        if _storage._useQueryHTTPMethod != rhs_storage._useQueryHTTPMethod {return false}
         return true
       }
       if !storagesAreEqual {return false}

@@ -52,7 +52,9 @@ final class ConformanceInvoker: Sendable {
                 host: "http://\(request.host):\(request.port)",
                 networkProtocol: try self.networkProtocol(for: request),
                 codec: try self.codec(for: request),
-                unaryGET: .alwaysEnabled,
+                // QUERY replaces POST, not GET, so GET must be off for QUERY requests.
+                unaryGET: request.useQueryHTTPMethod ? .disabled : .alwaysEnabled,
+                unaryQuery: request.useQueryHTTPMethod ? .enabled : .disabled,
                 timeout: request.hasTimeoutMs ? TimeInterval(request.timeoutMs / 1_000) : nil,
                 requestCompression: try self.requestCompression(for: request)
             )

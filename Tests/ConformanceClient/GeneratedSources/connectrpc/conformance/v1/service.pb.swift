@@ -502,12 +502,31 @@ nonisolated struct Connectrpc_Conformance_V1_ConformancePayload: Sendable {
     /// Clears the value of `connectGetInfo`. Subsequent reads from it will return its default value.
     mutating func clearConnectGetInfo() {self._connectGetInfo = nil}
 
+    /// The HTTP method the server observed for the request, such as "POST",
+    /// "GET", or "QUERY". The value is the exact method token, so "QUERY" is
+    /// uppercase.
+    ///
+    /// Servers that support the Connect protocol over the HTTP QUERY method
+    /// must populate this field for every request. It is only checked for test
+    /// cases that expect a QUERY request, so servers that do not yet populate
+    /// it keep passing all other test cases. Unlike connect_get_info, it is not
+    /// sufficient to merely include an empty message: the value is compared.
+    var httpMethod: String {
+      get {_httpMethod ?? String()}
+      set {_httpMethod = newValue}
+    }
+    /// Returns true if `httpMethod` has been explicitly set.
+    var hasHTTPMethod: Bool {self._httpMethod != nil}
+    /// Clears the value of `httpMethod`. Subsequent reads from it will return its default value.
+    mutating func clearHTTPMethod() {self._httpMethod = nil}
+
     var unknownFields = SwiftProtobuf.UnknownStorage()
 
     init() {}
 
     fileprivate var _timeoutMs: Int64? = nil
     fileprivate var _connectGetInfo: Connectrpc_Conformance_V1_ConformancePayload.ConnectGetInfo? = nil
+    fileprivate var _httpMethod: String? = nil
   }
 
   nonisolated struct ConnectGetInfo: Sendable {
@@ -1425,7 +1444,7 @@ nonisolated extension Connectrpc_Conformance_V1_ConformancePayload: SwiftProtobu
 
 nonisolated extension Connectrpc_Conformance_V1_ConformancePayload.RequestInfo: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = Connectrpc_Conformance_V1_ConformancePayload.protoMessageName + ".RequestInfo"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}request_headers\0\u{3}timeout_ms\0\u{1}requests\0\u{3}connect_get_info\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{3}request_headers\0\u{3}timeout_ms\0\u{1}requests\0\u{3}connect_get_info\0\u{3}http_method\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -1437,6 +1456,7 @@ nonisolated extension Connectrpc_Conformance_V1_ConformancePayload.RequestInfo: 
       case 2: try { try decoder.decodeSingularInt64Field(value: &self._timeoutMs) }()
       case 3: try { try decoder.decodeRepeatedMessageField(value: &self.requests) }()
       case 4: try { try decoder.decodeSingularMessageField(value: &self._connectGetInfo) }()
+      case 5: try { try decoder.decodeSingularStringField(value: &self._httpMethod) }()
       default: break
       }
     }
@@ -1459,6 +1479,9 @@ nonisolated extension Connectrpc_Conformance_V1_ConformancePayload.RequestInfo: 
     try { if let v = self._connectGetInfo {
       try visitor.visitSingularMessageField(value: v, fieldNumber: 4)
     } }()
+    try { if let v = self._httpMethod {
+      try visitor.visitSingularStringField(value: v, fieldNumber: 5)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -1467,6 +1490,7 @@ nonisolated extension Connectrpc_Conformance_V1_ConformancePayload.RequestInfo: 
     if lhs._timeoutMs != rhs._timeoutMs {return false}
     if lhs.requests != rhs.requests {return false}
     if lhs._connectGetInfo != rhs._connectGetInfo {return false}
+    if lhs._httpMethod != rhs._httpMethod {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

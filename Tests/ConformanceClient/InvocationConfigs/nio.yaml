@@ -10,6 +10,7 @@ features:
     - PROTOCOL_GRPC_WEB
     - PROTOCOL_GRPC
   supports_connect_get: true
+  supports_connect_query: true
   supports_half_duplex_bidi_over_http1: true
   supports_message_receive_limit: false
   supports_h2c: true

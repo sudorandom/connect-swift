@@ -516,6 +516,19 @@ nonisolated struct Connectrpc_Conformance_V1_Features: Sendable {
   /// Clears the value of `supportsMessageReceiveLimit`. Subsequent reads from it will return its default value.
   mutating func clearSupportsMessageReceiveLimit() {self._supportsMessageReceiveLimit = nil}
 
+  /// Whether Connect via the HTTP QUERY method is supported (RFC 10008).
+  /// If absent, false is assumed. Unlike supports_connect_get, this defaults
+  /// to false so that implementations that have not adopted QUERY keep passing
+  /// when they upgrade to a version of the test suite that includes it.
+  var supportsConnectQuery: Bool {
+    get {_supportsConnectQuery ?? false}
+    set {_supportsConnectQuery = newValue}
+  }
+  /// Returns true if `supportsConnectQuery` has been explicitly set.
+  var hasSupportsConnectQuery: Bool {self._supportsConnectQuery != nil}
+  /// Clears the value of `supportsConnectQuery`. Subsequent reads from it will return its default value.
+  mutating func clearSupportsConnectQuery() {self._supportsConnectQuery = nil}
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   init() {}
@@ -527,6 +540,7 @@ nonisolated struct Connectrpc_Conformance_V1_Features: Sendable {
   fileprivate var _supportsHalfDuplexBidiOverHTTP1: Bool? = nil
   fileprivate var _supportsConnectGet: Bool? = nil
   fileprivate var _supportsMessageReceiveLimit: Bool? = nil
+  fileprivate var _supportsConnectQuery: Bool? = nil
 }
 
 /// ConfigCase represents a single resolved configuration case. When tests are
@@ -687,7 +701,7 @@ nonisolated extension Connectrpc_Conformance_V1_Config: SwiftProtobuf.Message, S
 
 nonisolated extension Connectrpc_Conformance_V1_Features: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".Features"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}versions\0\u{1}protocols\0\u{1}codecs\0\u{1}compressions\0\u{3}stream_types\0\u{3}supports_h2c\0\u{3}supports_tls\0\u{3}supports_tls_client_certs\0\u{3}supports_trailers\0\u{3}supports_half_duplex_bidi_over_http1\0\u{3}supports_connect_get\0\u{3}supports_message_receive_limit\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}versions\0\u{1}protocols\0\u{1}codecs\0\u{1}compressions\0\u{3}stream_types\0\u{3}supports_h2c\0\u{3}supports_tls\0\u{3}supports_tls_client_certs\0\u{3}supports_trailers\0\u{3}supports_half_duplex_bidi_over_http1\0\u{3}supports_connect_get\0\u{3}supports_message_receive_limit\0\u{3}supports_connect_query\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -707,6 +721,7 @@ nonisolated extension Connectrpc_Conformance_V1_Features: SwiftProtobuf.Message,
       case 10: try { try decoder.decodeSingularBoolField(value: &self._supportsHalfDuplexBidiOverHTTP1) }()
       case 11: try { try decoder.decodeSingularBoolField(value: &self._supportsConnectGet) }()
       case 12: try { try decoder.decodeSingularBoolField(value: &self._supportsMessageReceiveLimit) }()
+      case 13: try { try decoder.decodeSingularBoolField(value: &self._supportsConnectQuery) }()
       default: break
       }
     }
@@ -753,6 +768,9 @@ nonisolated extension Connectrpc_Conformance_V1_Features: SwiftProtobuf.Message,
     try { if let v = self._supportsMessageReceiveLimit {
       try visitor.visitSingularBoolField(value: v, fieldNumber: 12)
     } }()
+    try { if let v = self._supportsConnectQuery {
+      try visitor.visitSingularBoolField(value: v, fieldNumber: 13)
+    } }()
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -769,6 +787,7 @@ nonisolated extension Connectrpc_Conformance_V1_Features: SwiftProtobuf.Message,
     if lhs._supportsHalfDuplexBidiOverHTTP1 != rhs._supportsHalfDuplexBidiOverHTTP1 {return false}
     if lhs._supportsConnectGet != rhs._supportsConnectGet {return false}
     if lhs._supportsMessageReceiveLimit != rhs._supportsMessageReceiveLimit {return false}
+    if lhs._supportsConnectQuery != rhs._supportsConnectQuery {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }

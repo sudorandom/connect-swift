@@ -94,6 +94,10 @@ nonisolated struct Connectrpc_Conformance_V1_TestSuite: Sendable {
   /// whether it is the client or the server that must support the limit.
   var reliesOnMessageReceiveLimit: Bool = false
 
+  /// If true, the cases in this suite rely on the Connect protocol over the
+  /// HTTP QUERY method.
+  var reliesOnConnectQuery: Bool = false
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   nonisolated enum TestMode: SwiftProtobuf.Enum, Swift.CaseIterable {
@@ -266,6 +270,15 @@ nonisolated struct Connectrpc_Conformance_V1_TestCase: Sendable {
   /// error is considered conformant, and the test case can pass.
   var otherAllowedErrorCodes: [Connectrpc_Conformance_V1_Code] = []
 
+  /// When expected_response indicates that an error with a message is expected, in
+  /// some cases, the actual error message returned may be flexible. In that case,
+  /// this field provides other acceptable error messages, in addition to the one
+  /// indicated in the expected_response. As long as the actual error's message
+  /// equals any of these, the error is considered conformant, and the test case
+  /// can pass. This field may only be used when expected_response has an error
+  /// with a message.
+  var otherAllowedErrorMessages: [String] = []
+
   var unknownFields = SwiftProtobuf.UnknownStorage()
 
   nonisolated struct ExpandedSize: Sendable {
@@ -305,7 +318,7 @@ fileprivate nonisolated let _protobuf_package = "connectrpc.conformance.v1"
 
 nonisolated extension Connectrpc_Conformance_V1_TestSuite: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".TestSuite"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{1}mode\0\u{3}test_cases\0\u{3}relevant_protocols\0\u{3}relevant_http_versions\0\u{3}relevant_codecs\0\u{3}relevant_compressions\0\u{3}connect_version_mode\0\u{3}relies_on_tls\0\u{3}relies_on_tls_client_certs\0\u{3}relies_on_connect_get\0\u{3}relies_on_message_receive_limit\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}name\0\u{1}mode\0\u{3}test_cases\0\u{3}relevant_protocols\0\u{3}relevant_http_versions\0\u{3}relevant_codecs\0\u{3}relevant_compressions\0\u{3}connect_version_mode\0\u{3}relies_on_tls\0\u{3}relies_on_tls_client_certs\0\u{3}relies_on_connect_get\0\u{3}relies_on_message_receive_limit\0\u{3}relies_on_connect_query\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -325,6 +338,7 @@ nonisolated extension Connectrpc_Conformance_V1_TestSuite: SwiftProtobuf.Message
       case 10: try { try decoder.decodeSingularBoolField(value: &self.reliesOnTlsClientCerts) }()
       case 11: try { try decoder.decodeSingularBoolField(value: &self.reliesOnConnectGet) }()
       case 12: try { try decoder.decodeSingularBoolField(value: &self.reliesOnMessageReceiveLimit) }()
+      case 13: try { try decoder.decodeSingularBoolField(value: &self.reliesOnConnectQuery) }()
       default: break
       }
     }
@@ -367,6 +381,9 @@ nonisolated extension Connectrpc_Conformance_V1_TestSuite: SwiftProtobuf.Message
     if self.reliesOnMessageReceiveLimit != false {
       try visitor.visitSingularBoolField(value: self.reliesOnMessageReceiveLimit, fieldNumber: 12)
     }
+    if self.reliesOnConnectQuery != false {
+      try visitor.visitSingularBoolField(value: self.reliesOnConnectQuery, fieldNumber: 13)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -383,6 +400,7 @@ nonisolated extension Connectrpc_Conformance_V1_TestSuite: SwiftProtobuf.Message
     if lhs.reliesOnTlsClientCerts != rhs.reliesOnTlsClientCerts {return false}
     if lhs.reliesOnConnectGet != rhs.reliesOnConnectGet {return false}
     if lhs.reliesOnMessageReceiveLimit != rhs.reliesOnMessageReceiveLimit {return false}
+    if lhs.reliesOnConnectQuery != rhs.reliesOnConnectQuery {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
@@ -398,7 +416,7 @@ nonisolated extension Connectrpc_Conformance_V1_TestSuite.ConnectVersionMode: Sw
 
 nonisolated extension Connectrpc_Conformance_V1_TestCase: SwiftProtobuf.Message, SwiftProtobuf._MessageImplementationBase, SwiftProtobuf._ProtoNameProviding {
   static let protoMessageName: String = _protobuf_package + ".TestCase"
-  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}request\0\u{3}expand_requests\0\u{3}expected_response\0\u{3}other_allowed_error_codes\0")
+  static let _protobuf_nameMap = SwiftProtobuf._NameMap(bytecode: "\0\u{1}request\0\u{3}expand_requests\0\u{3}expected_response\0\u{3}other_allowed_error_codes\0\u{3}other_allowed_error_messages\0")
 
   mutating func decodeMessage<D: SwiftProtobuf.Decoder>(decoder: inout D) throws {
     while let fieldNumber = try decoder.nextFieldNumber() {
@@ -410,6 +428,7 @@ nonisolated extension Connectrpc_Conformance_V1_TestCase: SwiftProtobuf.Message,
       case 2: try { try decoder.decodeRepeatedMessageField(value: &self.expandRequests) }()
       case 3: try { try decoder.decodeSingularMessageField(value: &self._expectedResponse) }()
       case 4: try { try decoder.decodeRepeatedEnumField(value: &self.otherAllowedErrorCodes) }()
+      case 5: try { try decoder.decodeRepeatedStringField(value: &self.otherAllowedErrorMessages) }()
       default: break
       }
     }
@@ -432,6 +451,9 @@ nonisolated extension Connectrpc_Conformance_V1_TestCase: SwiftProtobuf.Message,
     if !self.otherAllowedErrorCodes.isEmpty {
       try visitor.visitPackedEnumField(value: self.otherAllowedErrorCodes, fieldNumber: 4)
     }
+    if !self.otherAllowedErrorMessages.isEmpty {
+      try visitor.visitRepeatedStringField(value: self.otherAllowedErrorMessages, fieldNumber: 5)
+    }
     try unknownFields.traverse(visitor: &visitor)
   }
 
@@ -440,6 +462,7 @@ nonisolated extension Connectrpc_Conformance_V1_TestCase: SwiftProtobuf.Message,
     if lhs.expandRequests != rhs.expandRequests {return false}
     if lhs._expectedResponse != rhs._expectedResponse {return false}
     if lhs.otherAllowedErrorCodes != rhs.otherAllowedErrorCodes {return false}
+    if lhs.otherAllowedErrorMessages != rhs.otherAllowedErrorMessages {return false}
     if lhs.unknownFields != rhs.unknownFields {return false}
     return true
   }
