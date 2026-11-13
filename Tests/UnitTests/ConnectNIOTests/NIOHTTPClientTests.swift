@@ -16,6 +16,7 @@ import Connect
 @testable import ConnectNIO
 import Foundation
 import NIOCore
+import NIOHTTP1
 import NIOPosix
 import Testing
 
@@ -76,5 +77,20 @@ struct NIOHTTPClientTests {
         let closed = try await didClose.futureResult.get()
         deadline.cancel()
         #expect(closed, "The server never saw the connection close.")
+    }
+
+    @Test
+    func requestHeadUsesQueryMethodWithBodyPath() {
+        let request = HTTPRequest<Data?>(
+            url: URL(string: "https://connectrpc.com/svc/Method?ignored=1")!,
+            headers: [:],
+            message: Data([0x1]),
+            method: .query,
+            trailers: nil,
+            idempotencyLevel: .noSideEffects
+        )
+        let head = HTTPRequestHead.fromConnect(request, nioHeaders: NIOHTTP1.HTTPHeaders())
+        #expect(head.method.rawValue == "QUERY")
+        #expect(head.uri == "/svc/Method")
     }
 }

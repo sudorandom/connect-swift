@@ -18,6 +18,8 @@ import Foundation
 public struct ProtocolClientConfig: Sendable {
     /// Configuration used to determine when and how to send GET requests.
     public let unaryGET: UnaryGET
+    /// Configuration used to determine when to send HTTP QUERY requests.
+    public let unaryQuery: UnaryQuery
     /// Target host (e.g., `https://connectrpc.com`).
     public let host: String
     /// Protocol to use for requests and streams.
@@ -76,17 +78,45 @@ public struct ProtocolClientConfig: Sendable {
         }
     }
 
+    /// Configuration used to determine when to send HTTP QUERY requests.
+    /// HTTP QUERY requests (RFC 10008) can be sent in place of unary HTTP POST requests when
+    /// using the Connect protocol with idempotent RPCs that do not have side effects.
+    /// The request is identical to a POST request except for the method, and the response is
+    /// safe to cache.
+    ///
+    /// When `unaryGET` is also enabled, requests that qualify for GET are still sent using GET.
+    /// QUERY replaces POST, so it is used for requests that would otherwise be sent using POST,
+    /// such as those larger than the limit given to `.enabledForLimitedPayloadSizes`.
+    /// Requests are never retried with POST if the server rejects QUERY.
+    public enum UnaryQuery: Sendable {
+        /// Do not send idempotent requests using HTTP QUERY.
+        case disabled
+        /// Send idempotent requests using HTTP QUERY, regardless of their payload size.
+        case enabled
+
+        var isEnabled: Bool {
+            switch self {
+            case .enabled:
+                return true
+            case .disabled:
+                return false
+            }
+        }
+    }
+
     public init(
         host: String,
         networkProtocol: NetworkProtocol = .connect,
         codec: Codec = JSONCodec(),
         unaryGET: UnaryGET = .disabled,
+        unaryQuery: UnaryQuery = .disabled,
         timeout: TimeInterval? = nil,
         requestCompression: RequestCompression? = nil,
         responseCompressionPools: [CompressionPool] = [GzipCompressionPool()],
         interceptors: [InterceptorFactory] = []
     ) {
         self.unaryGET = unaryGET
+        self.unaryQuery = unaryQuery
         self.host = host
         self.networkProtocol = networkProtocol
         self.codec = codec

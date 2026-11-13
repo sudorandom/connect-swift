@@ -66,7 +66,9 @@ extension ProtocolClient: ProtocolClientInterface {
             transform: { intercepted, proceed in
                 do {
                     let data: Data
-                    if config.unaryGET.isEnabled && intercepted.idempotencyLevel == .noSideEffects {
+                    let usesCacheableMethod = config.unaryGET.isEnabled
+                        || config.unaryQuery.isEnabled
+                    if usesCacheableMethod && intercepted.idempotencyLevel == .noSideEffects {
                         data = try config.codec.deterministicallySerialize(
                             message: intercepted.message
                         )

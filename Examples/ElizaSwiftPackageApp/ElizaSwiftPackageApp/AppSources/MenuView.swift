@@ -43,7 +43,8 @@ struct MenuView: View {
             host: host,
             networkProtocol: networkProtocol,
             codec: ProtoCodec(), // Protobuf binary, or JSONCodec() for JSON
-            unaryGET: .disabled // Can enable to use cacheable unary HTTP GET requests
+            unaryGET: .disabled, // Can enable to use cacheable unary HTTP GET requests
+            unaryQuery: .disabled // Can enable to use cacheable unary HTTP QUERY requests
         )
         // For gRPC, use the NIO HTTP client:
         if case .custom = networkProtocol {

@@ -35,6 +35,13 @@ extension HTTPRequestHead {
                 uri: request.url.path,
                 headers: nioHeaders
             )
+        case .query:
+            return HTTPRequestHead(
+                version: .http1_1,
+                method: .RAW(value: HTTPMethod.query.rawValue),
+                uri: request.url.path,
+                headers: nioHeaders
+            )
         }
     }
 }

@@ -55,14 +55,21 @@ extension ConnectInterceptor: UnaryInterceptor {
             finalRequestBody = requestBody
         }
 
-        proceed(.success(self.config.transformToGETIfNeeded(HTTPRequest(
+        let finalRequest = HTTPRequest<Data?>(
             url: request.url,
             headers: headers,
             message: finalRequestBody,
             method: request.method,
             trailers: nil,
             idempotencyLevel: request.idempotencyLevel
-        ))))
+        )
+        // GET takes precedence. QUERY only replaces requests that would be sent using POST.
+        let getRequest = self.config.transformToGETIfNeeded(finalRequest)
+        if getRequest.method == .get {
+            proceed(.success(getRequest))
+        } else {
+            proceed(.success(self.config.transformToQUERYIfNeeded(finalRequest)))
+        }
     }
 
     @Sendable
@@ -242,6 +249,32 @@ extension ConnectInterceptor: StreamInterceptor {
 }
 
 extension ProtocolClientConfig {
+    func transformToQUERYIfNeeded(_ request: HTTPRequest<Data?>) -> HTTPRequest<Data?> {
+        guard self.shouldUseUnaryQuery(for: request) else {
+            return request
+        }
+
+        // The request is built exactly as it would be for POST, with only the method changed.
+        return HTTPRequest(
+            url: request.url,
+            headers: request.headers,
+            message: request.message,
+            method: .query,
+            trailers: request.trailers,
+            idempotencyLevel: request.idempotencyLevel
+        )
+    }
+
+    func shouldUseUnaryQuery(for request: HTTPRequest<Data?>) -> Bool {
+        guard
+            case .connect = self.networkProtocol, request.idempotencyLevel == .noSideEffects
+        else {
+            return false
+        }
+
+        return self.unaryQuery.isEnabled
+    }
+
     func transformToGETIfNeeded(_ request: HTTPRequest<Data?>) -> HTTPRequest<Data?> {
         guard self.shouldUseUnaryGET(for: request) else {
             return request

@@ -16,4 +16,6 @@
 public enum HTTPMethod: String, Sendable {
     case get = "GET"
     case post = "POST"
+    /// The HTTP QUERY method defined by RFC 10008.
+    case query = "QUERY"
 }
